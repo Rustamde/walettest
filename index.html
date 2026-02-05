@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Loading State -->
+        <div id="loading" class="empty-state">
+            <div class="loader"></div>
+            <p>Waiting for context...</p>
+        </div>
+
+        <!-- No Data State -->
+        <div id="no-data" class="empty-state" style="display: none;">
+            <p>No wallet account found for this user.</p>
+        </div>
+
+        <!-- Wallet Content -->
+        <div id="wallet-content" style="display: none;">
+            
+            <div class="profile-card">
+                <img src="" alt="Avatar" class="avatar" id="user-avatar">
+                <div class="user-info">
+                    <h2 id="user-name"></h2>
+                    <p class="email" id="user-email"></p>
+                    <span class="status-badge" id="user-status"></span>
+                </div>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">Current Balance</div>
+                <div class="balance-amount" id="user-balance"></div>
+            </div>
+
+            <div class="transactions-section">
+                <div class="transactions-header">
+                    <span>Recent Transactions</span>
+                </div>
+                <div class="transactions-list" id="transactions-list">
+                    <!-- Transactions will be injected here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
