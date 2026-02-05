@@ -28,6 +28,10 @@ function formatDate(dateStr) {
 }
 
 function renderUser(user) {
+    // 0. Detect View from Query Params
+    const urlParams = new URLSearchParams(window.location.search);
+    const view = urlParams.get('view') || 'payments'; // Default to payments
+
     // Hide loading, show content
     els.loading.style.display = 'none';
     els.noData.style.display = 'none';
@@ -39,12 +43,51 @@ function renderUser(user) {
     els.email.textContent = user.email;
     els.status.textContent = user.status;
 
-    // Update Balance
-    els.balance.textContent = formatCurrency(user.balance, user.currency);
+    // Determine target data and title
+    let targetData = [];
+    let title = "Recent Transactions";
+    let balanceLabel = "Current Balance";
 
-    // Update Transactions
-    els.transactions.innerHTML = ''; // Clear prev
-    user.transactions.forEach(t => {
+    // Show/Hide Admin Section
+    const adminSection = document.getElementById('admin-actions');
+    if (adminSection) adminSection.style.display = (view === 'admin') ? 'grid' : 'none';
+
+    if (view === 'payouts') {
+        targetData = user.payouts || [];
+        title = "Recent Payouts";
+        balanceLabel = "Total Payouts";
+    } else if (view === 'orders') {
+        targetData = user.orders || [];
+        title = "Recent Orders";
+        balanceLabel = "Total Spent";
+    } else if (view === 'admin') {
+        targetData = []; // Admin view might show logs instead
+        title = "Employee Admin Panel";
+        balanceLabel = "Risk Score";
+        els.balance.textContent = "Low (0.05)";
+    } else {
+        targetData = user.payments || [];
+        title = "Recent Payments";
+        balanceLabel = "Current Balance";
+    }
+
+    // Update Titles
+    const headerTitle = document.querySelector('.transactions-header span');
+    const labelText = document.querySelector('.balance-label');
+    if (headerTitle) headerTitle.textContent = title;
+    if (labelText) labelText.textContent = balanceLabel;
+
+    if (view !== 'admin') {
+        els.balance.textContent = formatCurrency(user.balance, user.currency);
+    }
+
+    // Update Transactions/List
+    els.transactions.innerHTML = '';
+    if (view !== 'admin' && targetData.length === 0) {
+        els.transactions.innerHTML = '<div class="empty-state" style="padding:20px">No data for this category.</div>';
+    }
+
+    targetData.forEach(t => {
         const item = document.createElement('div');
         item.className = 'transaction-item';
 
@@ -52,16 +95,31 @@ function renderUser(user) {
         const sign = isCredit ? '+' : '';
         const amountClass = isCredit ? 'credit' : 'debit';
 
+        const subtext = view === 'orders' ? `Order ID: ${t.id} • ${t.status}` : formatDate(t.date);
+
         item.innerHTML = `
             <div class="t-info">
                 <span class="t-desc">${t.description}</span>
-                <span class="t-date">${formatDate(t.date)}</span>
+                <span class="t-date">${subtext}</span>
             </div>
             <div class="t-amount ${amountClass}">${sign}${formatCurrency(t.amount, user.currency)}</div>
         `;
         els.transactions.appendChild(item);
     });
 }
+
+// Admin Action Logics
+window.performAction = function (action) {
+    const actions = {
+        block: { msg: "Юзер заблокирован!", color: "#ef4444" },
+        refund: { msg: "Возврат оформлен!", color: "#3b82f6" },
+        verify: { msg: "Личность подтверждена!", color: "#10b981" }
+    };
+
+    const config = actions[action];
+    alert(config.msg);
+    console.log(`Admin took action: ${action}`);
+};
 
 function renderNoData() {
     els.loading.style.display = 'none';

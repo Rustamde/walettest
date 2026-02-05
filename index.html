@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container" id="app">
         <!-- Loading State -->
@@ -22,7 +24,7 @@
 
         <!-- Wallet Content -->
         <div id="wallet-content" style="display: none;">
-            
+
             <div class="profile-card">
                 <img src="" alt="Avatar" class="avatar" id="user-avatar">
                 <div class="user-info">
@@ -35,6 +37,13 @@
             <div class="balance-section">
                 <div class="balance-label">Current Balance</div>
                 <div class="balance-amount" id="user-balance"></div>
+            </div>
+
+            <!-- Admin Panel Section (Hidden by default) -->
+            <div id="admin-actions" class="admin-grid" style="display: none; margin-bottom: 24px;">
+                <button class="admin-btn btn-danger" onclick="performAction('block')">Block User</button>
+                <button class="admin-btn btn-primary" onclick="performAction('refund')">Offer Refund</button>
+                <button class="admin-btn btn-success" onclick="performAction('verify')">Verify ID</button>
             </div>
 
             <div class="transactions-section">
@@ -51,4 +60,5 @@
 
     <script type="module" src="app.js"></script>
 </body>
+
 </html>
