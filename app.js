@@ -70,25 +70,47 @@ function renderNoData() {
 }
 
 function handleMessage(event) {
-    // Chatwoot sends data in event.data
-    // Expected structure: { event: 'appContext', data: { contact: { email: '...' } } }
+    // 1. Log the raw event for debugging
+    console.log("Raw event received from sender:", event.origin, event.data);
 
-    // For safety, you might want to check event.origin if known
+    let eventData = event.data;
 
-    const eventData = event.data;
+    // 2. Handle stringified JSON just in case
+    if (typeof eventData === 'string') {
+        try {
+            eventData = JSON.parse(eventData);
+            console.log("Parsed stringified eventData:", eventData);
+        } catch (e) {
+            console.error("Failed to parse eventData as JSON:", e);
+            return;
+        }
+    }
 
-    // Log for debugging
-    console.log("Received event:", eventData);
-
+    // 3. Check for Chatwoot appContext event
     if (eventData && eventData.event === 'appContext' && eventData.data && eventData.data.contact) {
         const email = eventData.data.contact.email;
-        const user = mockData.find(u => u.email === email);
+        console.log("Found email in context:", email);
+
+        if (!email) {
+            console.warn("Email is null or empty in the received contact context.");
+            renderNoData();
+            return;
+        }
+
+        // 4. Case-insensitive search
+        const user = mockData.find(u => u.email.toLowerCase() === email.toLowerCase());
+
         if (user) {
+            console.log("Matching user found:", user.name);
             renderUser(user);
         } else {
-            console.warn(`User with email ${email} not found in mock data.`);
+            console.warn(`User with email [${email}] not found in mock data.`);
             renderNoData();
+            // Show a temporary debug message in the UI so the user knows what email was received
+            els.noData.innerHTML = `<p>No wallet account found for <b>${email}</b>.</p><p style='font-size:10px; color:gray'>Received event type: ${eventData.event}</p>`;
         }
+    } else {
+        console.log("Ignored event (not appContext or missing contact info)");
     }
 }
 
